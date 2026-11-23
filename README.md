@@ -1,33 +1,59 @@
 # Mixed-fleet bus scheduling
 
-Verification code for *Mixed-Fleet Bus Scheduling with Fixed Routes and Flexible Minibuses*.
-The case has twelve stops, two fixed-route directions and direct minibus assignments.
-The objective combines normalized operating and energy costs with a vehicle-class congestion credit.
+[![Reproduce scheduling results](https://github.com/Azure-127031/mixed-fleet-bus-scheduling/actions/workflows/reproduce.yml/badge.svg?branch=main)](https://github.com/Azure-127031/mixed-fleet-bus-scheduling/actions/workflows/reproduce.yml)
 
-## Exact reference with standard Python
+[中文说明](README.zh-CN.md) · [Reproduction guide](docs/reproduction.md) · [Run-level data](results/runs.csv) · [Cite this code](CITATION.cff)
 
-    python reference.py
+How many large and medium buses should run in each direction, and how many minibuses should serve direct trips? This repository accompanies *Mixed-Fleet Bus Scheduling with Fixed Routes and Flexible Minibuses*. It includes the original integer model, three search implementations and an exact reference for a simulated 12-stop corridor.
 
-The script enumerates 1,326 pairs of large-bus counts and assigns the least feasible number of medium buses in each direction. It takes the aggregate route demands and the total minibus cost as inputs. The expected normalized score is 6268.946555. One optimal allocation uses 24 large and five medium buses forward, and 26 large and two medium buses in reverse. The direct minibus component is fixed for this case.
+![Six stops on a bidirectional loop and six other stops, beside a 12-by-12 matrix of direct minibus counts.](docs/case-overview.png)
 
-## Verify the underlying integer model and rerun the three searches
+Large and medium buses follow the loop **1 → 2 → 3 → 7 → 8 → 9 → 1** in both directions. The matrix shows how **224 minibuses** serve **116 directed stop pairs**. Read each row as an origin and each column as a destination. [Model inputs](original/goal.py) · [Exact allocations by stop pair](results/case.json)
 
-The original four Python modules are in original/. The tested environment is Python 3.10.18 on Windows with PuLP's bundled CBC solver.
+## Try the exact reference
 
-    python -m pip install -r requirements.txt
-    python verify_case.py original > fresh_case.json
-    python check_search.py original fresh_case.json fresh_runs.csv
+```sh
+git clone https://github.com/Azure-127031/mixed-fleet-bus-scheduling.git
+cd mixed-fleet-bus-scheduling
+python reference.py
+```
 
-For Windows PowerShell 5.1, write the JSON using the following command.
+This calculation uses the Python standard library. It enumerates 1,326 feasible pairs of large-bus counts under the large-fleet limit and computes the medium-bus requirement in each direction.
 
-    python verify_case.py original | Out-File -Encoding utf8 fresh_case.json
+```text
+Optimal normalized objective: 6268.946555
+Forward (large, medium): (24, 5)
+Reverse (large, medium): (26, 2)
+```
 
-The first driver computes the direct allocations from the demand matrix, checks feasibility and resolves the original integer model with the four fixed-route counts released. It prints the numerical reference and the positive minibus allocations as JSON. Run it before the second driver.
+## Reproduce the comparison
 
-The second driver compares archived HHO, MSPSO and FPSOHHO implementations on one demand matrix. It uses seeds 0–19, 30 particles, a nominal 120-iteration schedule and 6,500 calls to the common fitness evaluator per algorithm per seed. Each final incumbent is checked against the original integer evaluator. The output CSV has 60 rows. The reference JSON and all 60 run-level results are included in results/. The mean scores are 8552.5 (HHO), 6352.2 (MSPSO) and 6441.6 (FPSOHHO). Lower values are better.
+With Python 3.10.18, run the following from the repository root.
 
-The ten-run historical statistics in the manuscript used a different protocol. These drivers reproduce the independent twenty-seed comparison.
+```sh
+python -m pip install -r requirements.txt
+python reproduce.py
+```
 
-## License
+The command solves the model with CBC, reruns all three searches and checks each final allocation against the archived record. Each method gets 6,500 fitness calls for each of 20 paired seeds on the same demand matrix. Lower scores are better.
 
-Repository code is distributed under the MIT License.
+| Search method | Mean normalized objective | Runs reaching the exact optimum |
+| --- | ---: | ---: |
+| Mixed-search particle swarm (MSPSO) | 6,352.2 | 5 / 20 |
+| Hybrid particle swarm and Harris hawks (FPSOHHO) | 6,441.6 | 4 / 20 |
+| Harris hawks (HHO) | 8,552.5 | 0 / 20 |
+
+MSPSO and the hybrid both recovered the exact allocation cost. MSPSO had the lower mean under this evaluation budget. The twenty seeds measure variation in search on one instance. [Individual runs](results/runs.csv) · [Protocol and output fields](docs/reproduction.md)
+
+## Explore the implementation
+
+| To inspect | Open |
+| --- | --- |
+| Stop coordinates, demand, capacity constraints and objective | [Original scheduling model](original/goal.py) |
+| Search updates and switching logic | [HHO](original/HHO.py) · [MSPSO](original/MSPSO.py) · [FPSOHHO](original/FPSOHHO.py) |
+| Derivation and verification of the reference value | [Standard-library enumeration](reference.py) · [CBC cross-check](verify_case.py) |
+| Common evaluation budget, seeds and final allocations | [Experiment driver](check_search.py) · [Raw results](results/) |
+
+## Citation and license
+
+For research use, cite the software and record the release or commit used. GitHub's **Cite this repository** button reads the software citation metadata. [Citation metadata](CITATION.cff) · [Releases](https://github.com/Azure-127031/mixed-fleet-bus-scheduling/releases) · [MIT License](LICENSE)

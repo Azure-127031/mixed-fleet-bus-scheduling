@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "Please cite the software and identify the release or commit used."
+type: software
+title: "Mixed-fleet bus scheduling: reproducibility code"
+authors:
+  - name: "Mixed-fleet bus scheduling contributors"
+repository-code: "https://github.com/Azure-127031/mixed-fleet-bus-scheduling"
+license: MIT
+version: "1.0.0"
