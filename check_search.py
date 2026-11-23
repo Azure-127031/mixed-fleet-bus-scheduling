@@ -48,4 +48,3 @@ with Path(sys.argv[3]).open('w',newline='',encoding='utf-8') as out, open(os.dev
                 pass
             assert counter.calls==6500 and abs(g.objective(counter.counts)-counter.best)<1e-6
             writer.writerow([seed,algo.__name__,counter.calls,len(counter.visited),counter.best,*counter.counts]);out.flush()
-

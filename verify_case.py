@@ -49,4 +49,3 @@ assert pulp.LpStatus[status]=='Optimal' and abs(pulp.value(model.objective)-best
 exceed=[(i,j) for i,j in mini if g.dist_matrix[i][j]*60/g.v[2]>g.MAX_WAIT_TIME]
 result=dict(model_sha256=hashlib.sha256(Path(g.__file__).read_bytes()).hexdigest(), passengers=sum(map(sum,g.demand_matrix)), routes_demand=demands,peak_loads=peaks,route_length=distances, route_legs=len(g.fixed_legs), od_positive=sum(x>0 for row in g.demand_matrix for x in row), mini_links=len(mini), minibuses=sum(mini.values()), minibus_term=minicost, exact_counts=optimum, exact_score=best,cbc_score=pulp.value(model.objective), original_initial_counts=initial,original_initial_score=initial_value,identical_score_with_changed_tail=tail_value,over_five_minute_served_links=len(exceed), over_five_fixed_links=sum(t[0] for t in g.fixed_legs_time_status.values()), minibus_by_od=dispatch)
 print(json.dumps(result,indent=2))
-
