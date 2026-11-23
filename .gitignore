@@ -1,0 +1,4 @@
+__pycache__/
+.venv/
+fresh_case.json
+fresh_runs.csv
