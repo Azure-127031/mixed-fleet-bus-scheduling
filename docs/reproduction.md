@@ -19,7 +19,7 @@ python verify_case.py original > fresh_case.json
 python check_search.py original fresh_case.json fresh_runs.csv
 ```
 
-Windows PowerShell 5.1 users can write the first output in UTF-8 with `python verify_case.py original | Out-File -Encoding utf8 fresh_case.json`. The full comparison uses Python 3.10.18, NumPy 2.2.6, Matplotlib 3.10.7 and PuLP 3.3.0 with CBC. The plotting import in the original model is used in a headless environment by the one-command runner.
+Windows PowerShell 5.1 users can write the first output in UTF-8 with `python verify_case.py original | Out-File -Encoding utf8 fresh_case.json`. The archived comparison used Python 3.10.18, NumPy 2.2.6, Matplotlib 3.10.7 and PuLP 3.3.0 with CBC. The GitHub workflow uses Windows and CPython 3.10.11 with the same pinned package versions. The plotting import in the original model is used in a headless environment by the one-command runner.
 
 ## Read a run
 

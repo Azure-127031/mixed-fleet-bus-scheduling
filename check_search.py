@@ -35,7 +35,7 @@ class Counter:
         if value<self.best:
             self.best=value;self.counts=counts
         return value
-with Path(sys.argv[3]).open('w',newline='',encoding='utf-8') as out, open(os.devnull,'w') as quiet:
+with Path(sys.argv[3]).open('w',newline='',encoding='utf-8') as out, open(os.devnull,'w',encoding='utf-8') as quiet:
     writer=csv.writer(out);writer.writerow(['seed','algorithm','fitness_calls','distinct_schedules','best_score','large_forward','medium_forward','large_reverse','medium_reverse'])
     for seed in range(20):
         for algo in (HHO,MSPSO,FPSOHHO):
